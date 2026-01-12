@@ -1,0 +1,32 @@
+name: 🛡️ Guardian Deployment & Verification
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy_and_verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: 🏗️ Install Dependencies
+        run: npm install
+
+      - name: 🚀 Deploy Security Rules & Functions
+        uses: w9jds/firebase-action@master
+        with:
+          # Deploys Hosting, Functions, and Firestore Rules simultaneously
+          args: deploy --only hosting,functions,firestore
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
+      - name: 🔍 Verify Regional Lock (asia-southeast1)
+        uses: w9jds/firebase-action@master
+        with:
+          # This command lists functions so you can verify the region in the GitHub logs
+          args: functions:list
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}

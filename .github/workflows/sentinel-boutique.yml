@@ -1,0 +1,16 @@
+name: 🛡️ RPR-VERIFY Sentinel Deploy
+on:
+  push:
+    branches:
+      - rpr-verify
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: 🚀 Deploy to Firebase
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only functions,firestore
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}

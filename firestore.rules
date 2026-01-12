@@ -1,0 +1,18 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Deny updates to ledger entries that are outside of Malaysia or have a high transaction amount
+    match /ledgers/{ledgerId} {
+      allow update: if request.resource.data.currency == 'MYR' && request.resource.data.amount <= 1000000;
+      // You can add other rules for create, read, and delete as needed
+      allow create, read, delete: if true; // Example: allow all other operations
+    }
+
+    // Allow all operations on other collections for now
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
