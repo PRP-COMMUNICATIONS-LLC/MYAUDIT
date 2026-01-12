@@ -13,5 +13,10 @@ export default defineConfig(({ mode }) => {
     define: {
       'process.env.VITE_GEMINI_API_KEY': JSON.stringify(env.VITE_GEMINI_API_KEY),
     },
+    server: {
+      hmr: {
+        clientPort: 9000,
+      }
+    }
   };
 });

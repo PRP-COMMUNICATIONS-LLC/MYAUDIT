@@ -30,3 +30,28 @@ This project is automatically deployed via **GitHub Actions** to **Firebase Host
    ```bash
    npm run dev
    ```
+
+## Push-to-Deploy via GitHub Actions
+
+MYAUDIT uses GitHub Actions to deploy Firebase Functions, Firestore rules, and Hosting to the `myaudit-tax-2026` project.
+
+### One-time setup (Founder)
+
+1. Run `firebase login:ci` on any machine to generate a CI token.
+2. Copy the long token string (starts with `1//`).
+3. In GitHub, go to **Settings → Secrets and variables → Actions**.
+4. Click **New repository secret**:
+   - Name: `FIREBASE_TOKEN`
+   - Value: paste the token.
+5. Save.
+
+### Daily workflow
+
+- Commit and push to the `main` branch.
+- GitHub Actions (`.github/workflows/deploy.yml`) will:
+  - Build the frontend.
+  - Install backend dependencies.
+  - Run `firebase deploy --only functions,firestore:rules,hosting:myaudit-tax-2026`.
+- Monitor progress and logs in the **Actions** tab in GitHub.
+
+<!-- This is a comment to trigger deployment -->

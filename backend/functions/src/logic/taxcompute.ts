@@ -1,6 +1,6 @@
 import { firestore } from 'firebase-admin';
 
-const SME_BANDS_2026 = [
+const SME_BANDS_2026: { threshold: number; rate: number }[] = [
     { threshold: 150000, rate: 0.15 },
     { threshold: 600000, rate: 0.17 },
     { threshold: Infinity, rate: 0.24 },
@@ -13,7 +13,7 @@ interface TaxEngineResult2026 {
     chargeableIncome: number;
 }
 
-async function calculateTaxYA2026(chargeableIncome: number): Promise<TaxEngineResult2026> {
+export async function calculateTaxYA2026(chargeableIncome: number): Promise<TaxEngineResult2026> {
     let taxPayable = 0;
     let remainingIncome = chargeableIncome;
 
@@ -25,7 +25,7 @@ async function calculateTaxYA2026(chargeableIncome: number): Promise<TaxEngineRe
         remainingIncome -= taxableAtThisBand;
     }
 
-    const effectiveRate = taxPayable / chargeableIncome;
+    const effectiveRate = chargeableIncome > 0 ? taxPayable / chargeableIncome : 0;
 
     // Log the audit trail
     await firestore().collection('auditLogs').add({

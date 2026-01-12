@@ -1,5 +1,6 @@
-import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
-import { db } from '../firebase';
+import { doc, setDoc, arrayUnion } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, storage } from '../firebase';
 
 export const resolveAuditGap = async (
   entryId: string, 
@@ -7,16 +8,29 @@ export const resolveAuditGap = async (
 ) => {
   const entryRef = doc(db, 'ledger_entries', entryId);
 
-  const finalUpdate: any = {};
+  const finalUpdate: { [key: string]: any } = {};
   
   if (updates.category) {
     finalUpdate.category = updates.category;
   }
   
   if (updates.docUrl) {
-    // We add to the array to allow multiple supporting documents
     finalUpdate.supportingDocLinks = arrayUnion(updates.docUrl);
   }
 
-  return await updateDoc(entryRef, finalUpdate);
+  return await setDoc(entryRef, finalUpdate, { merge: true });
+};
+
+export const uploadReceiptAndUpdateLedger = async (
+  entityId: string, 
+  entryId: string, 
+  file: File
+) => {
+  const storagePath = `receipts/${entityId}/${entryId}/${file.name}`;
+  const storageRef = ref(storage, storagePath);
+  const uploadResult = await uploadBytes(storageRef, file);
+  
+  const downloadURL = await getDownloadURL(uploadResult.ref);
+  
+  return await resolveAuditGap(entryId, { docUrl: downloadURL });
 };

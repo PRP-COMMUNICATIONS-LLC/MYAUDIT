@@ -6,10 +6,13 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "seed:rule-registry": "ts-node backend/scripts/seedRuleRegistry.ts"
   },
   "dependencies": {
     "@google/genai": "^1.34.0",
+    "firebase": "^12.7.0",
+    "firebase-admin": "^13.6.0",
     "i18next": "^23.10.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
@@ -20,6 +23,8 @@
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.18",
     "@types/node": "^22.19.5",
+    "@types/react": "^19.2.8",
+    "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.2",
     "typescript": "~5.8.2",
     "vite": "^6.4.1"

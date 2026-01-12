@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { TaxComputationResult } from '../types';
 
 // --- Statutory Rates Logic ---
 const getStatutoryRates = (year: number) => {
@@ -40,7 +41,7 @@ const TaxCalculator: React.FC = () => {
 
   const minWageWarning = useMemo(() => grossSalary > 0 && grossSalary < rates.minWage, [grossSalary, rates.minWage]);
 
-  const deductions = useMemo(() => {
+  const computationResult: TaxComputationResult = useMemo(() => {
     const epfRate = residencyStatus === 'citizen' ? citizenEpfRate : rates.foreignEPFRate;
     const socsoEisSalaryCap = Math.min(grossSalary, rates.socsoCeiling);
     const socsoRate = 0.005; // Approximate rate, actual is based on a table
@@ -49,12 +50,20 @@ const TaxCalculator: React.FC = () => {
     const epf = grossSalary * epfRate;
     const socso = socsoEisSalaryCap * socsoRate;
     const eis = socsoEisSalaryCap * eisRate;
-    const total = epf + socso + eis;
+    const totalDeductions = epf + socso + eis;
+    const netPay = grossSalary - totalDeductions;
 
-    return { epf, socso, eis, total, epfRate };
+    return {
+        grossSalary,
+        netPay,
+        deductions: {
+            epf,
+            socso,
+            eis,
+            total: totalDeductions,
+        },
+    };
   }, [grossSalary, residencyStatus, rates, citizenEpfRate]);
-
-  const netPay = useMemo(() => grossSalary - deductions.total, [grossSalary, deductions.total]);
 
   const handleVerify = async () => {
     const complianceNote = (auditYear >= 2026 && minWageWarning) 
@@ -70,11 +79,11 @@ const TaxCalculator: React.FC = () => {
       - SOCSO/EIS Salary Cap for ${auditYear}: RM ${rates.socsoCeiling.toFixed(2)}
 
       Deductions Applied:
-      - EPF Deduction (${(deductions.epfRate * 100).toFixed(0)}%): RM ${deductions.epf.toFixed(2)}
-      - SOCSO Deduction (~0.5% on capped salary): RM ${deductions.socso.toFixed(2)}
-      - EIS Deduction (0.2% on capped salary): RM ${deductions.eis.toFixed(2)}
-      - Total Deductions: RM ${deductions.total.toFixed(2)}
-      - Net Pay: RM ${netPay.toFixed(2)}
+      - EPF Deduction (${((residencyStatus === 'citizen' ? citizenEpfRate : rates.foreignEPFRate) * 100).toFixed(0)}%): RM ${computationResult.deductions.epf.toFixed(2)}
+      - SOCSO Deduction (~0.5% on capped salary): RM ${computationResult.deductions.socso.toFixed(2)}
+      - EIS Deduction (0.2% on capped salary): RM ${computationResult.deductions.eis.toFixed(2)}
+      - Total Deductions: RM ${computationResult.deductions.total.toFixed(2)}
+      - Net Pay: RM ${computationResult.netPay.toFixed(2)}
 
       ${complianceNote}
 
@@ -136,14 +145,14 @@ const TaxCalculator: React.FC = () => {
           </div>
           <div className="border-t border-slate-200 pt-4">
             <h3 className="text-lg font-semibold text-slate-700 mb-2">Deductions Breakdown</h3>
-            <div className="flex justify-between text-sm text-slate-600"><p>EPF ({(deductions.epfRate * 100).toFixed(0)}%):</p><p>- RM {deductions.epf.toFixed(2)}</p></div>
-            <div className="flex justify-between text-sm text-slate-600"><p>SOCSO (~0.5%):</p><p>- RM {deductions.socso.toFixed(2)}</p></div>
-            <div className="flex justify-between text-sm text-slate-600"><p>EIS (0.2%):</p><p>- RM {deductions.eis.toFixed(2)}</p></div>
-            <div className="flex justify-between font-semibold text-slate-800 mt-2 border-t border-slate-200 pt-2"><p>Total Deductions:</p><p>- RM {deductions.total.toFixed(2)}</p></div>
+            <div className="flex justify-between text-sm text-slate-600"><p>EPF (${((residencyStatus === 'citizen' ? citizenEpfRate : rates.foreignEPFRate) * 100).toFixed(0)}%):</p><p>- RM {computationResult.deductions.epf.toFixed(2)}</p></div>
+            <div className="flex justify-between text-sm text-slate-600"><p>SOCSO (~0.5%):</p><p>- RM {computationResult.deductions.socso.toFixed(2)}</p></div>
+            <div className="flex justify-between text-sm text-slate-600"><p>EIS (0.2%):</p><p>- RM {computationResult.deductions.eis.toFixed(2)}</p></div>
+            <div className="flex justify-between font-semibold text-slate-800 mt-2 border-t border-slate-200 pt-2"><p>Total Deductions:</p><p>- RM {computationResult.deductions.total.toFixed(2)}</p></div>
           </div>
           <div className="flex justify-between items-center border-t-2 border-blue-600 pt-4 mt-4">
             <p className="text-xl font-bold text-slate-800">Net Pay:</p>
-            <p className="text-xl font-bold text-blue-600">RM {netPay.toFixed(2)}</p>
+            <p className="text-xl font-bold text-blue-600">RM {computationResult.netPay.toFixed(2)}</p>
           </div>
           <div className="mt-6 text-center">
             <button onClick={handleVerify} className="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-sm">

@@ -1,31 +1,39 @@
-import { LedgerEntry } from '../types';
+import { LedgerEntry, RuleRegistry, DieFlag } from "../types";
 
-const NOTIONAL_RISK_RATE = 0.24; // Worst-case corporate rate for simulation
-const DOCUMENT_GAP_THRESHOLD = 500;
+export function detectMisclassifications(entry: LedgerEntry, rules: RuleRegistry[]): DieFlag[] {
+    const flags: DieFlag[] = [];
 
-export interface ForensicRiskScore {
-  estimatedExposure: number;
-  simulatedLeakage: number;
-  riskLevel: 'LOW' | 'MEDIUM' | 'HIGH';
+    for (const rule of rules) {
+        const keywordMatch = rule.conditions.keywords.some(keyword => 
+            entry.description.toLowerCase().includes(keyword.toLowerCase())
+        );
+
+        if (keywordMatch && entry.category !== rule.conditions.category) {
+            flags.push({
+                flagType: "MISCLASSIFICATION_RISK",
+                suggestion: `Entry "${entry.description}" might be miscategorized. Expected ${rule.conditions.category}, but found ${entry.category}.`,
+                estimatedImpact: `Potential tax impact depends on category change.`,
+                confidence: 0.8,
+                createdAt: Date.now(),
+            });
+        }
+    }
+
+    return flags;
 }
 
-/**
- * HEURISTIC ONLY: Estimates potential tax disallowance risk.
- * This is a simulation tool, not a statutory tax engine.
- */
-export const estimateRiskSimulation = (entries: LedgerEntry[]): ForensicRiskScore => {
-  // We sum the 'debit' side as these represent the expenses being claimed
-  const highRiskEntries = entries.filter(e => 
-    (e.debit > DOCUMENT_GAP_THRESHOLD && (!e.supportingDocLinks || e.supportingDocLinks.length === 0)) ||
-    (e.category === 'Uncategorized')
-  );
+export function estimateRiskSimulation(entries: LedgerEntry[]) {
+    const highRiskEntries = entries.filter(e => 
+        (e.debit > 500 && (!e.supportingDocLinks || e.supportingDocLinks.length === 0)) ||
+        e.category === 'Uncategorized'
+    );
 
-  const estimatedExposure = highRiskEntries.reduce((sum, e) => sum + e.debit, 0);
-  const simulatedLeakage = estimatedExposure * NOTIONAL_RISK_RATE;
+    const estimatedExposure = highRiskEntries.reduce((acc, entry) => acc + entry.debit, 0);
+    const simulatedLeakage = estimatedExposure * 0.24; // 24% tax rate
 
-  let riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' = 'LOW';
-  if (simulatedLeakage > 5000) riskLevel = 'HIGH';
-  else if (simulatedLeakage > 1000) riskLevel = 'MEDIUM';
-
-  return { estimatedExposure, simulatedLeakage, riskLevel };
-};
+    return {
+        estimatedExposure,
+        simulatedLeakage,
+        riskLevel: simulatedLeakage > 10000 ? 'HIGH' : 'MEDIUM',
+    };
+}
