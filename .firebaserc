@@ -1,0 +1,23 @@
+{
+  "projects": {
+    "default": "myaudit-59914983-2ad0f"
+  },
+  "targets": {
+    "myaudit-59914983-2ad0f": {
+      "hosting": {
+        "main": [
+          "myaudit-59914983-2ad0f"
+        ]
+      }
+    },
+    "myaudit-tax-2026": {
+      "hosting": {
+        "main": [
+          "myaudit-59914983-2ad0f"
+        ]
+      }
+    }
+  },
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
+}
