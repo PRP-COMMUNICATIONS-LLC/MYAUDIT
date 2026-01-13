@@ -1,60 +1,55 @@
-
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { Header } from './components/layout/Header';
+import IncentiveProfile from './components/IncentiveProfile';
+import { DocumentUploader } from './components/ingestion/DocumentUploader';
+import ExtractionResults from './components/ingestion/ExtractionResults';
 import RefinementView from './views/RefinementView';
-import RiskSimulationView from './views/RiskSimulationView';
+import TaxView from './views/TaxView';
+import { LedgerEntry, IncentiveSignals } from './types';
 
-const ExtractionView = () => (
-  <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-8">
-    <h2 className="text-2xl font-bold text-gray-800">Extraction View</h2>
-    <p className="mt-4 text-gray-600">Content for data extraction goes here.</p>
-  </div>
-);
+const App: React.FC = () => {
+  const [activeTab, setActiveTab] = useState('Tax');
+  const [entries, setEntries] = useState<LedgerEntry[]>([]);
+  const [signals, setSignals] = useState<IncentiveSignals>({ 
+    usesAutomation: true,
+    reinvestsInAssets: false,
+    employsDisabledStaff: false,
+    frequentSmallAssets: false,
+    hasPioneerStatus: false
+  });
 
-function App() {
-  const [activeTab, setActiveTab] = useState<'extraction' | 'refinement' | 'risk-simulator'>('extraction');
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+  };
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'extraction':
-        return <ExtractionView />;
-      case 'refinement':
-        return <RefinementView />;
-      case 'risk-simulator':
-        return <RiskSimulationView />;
-      default:
-        return <ExtractionView />;
-    }
+  const handleEntriesExtracted = (entries: LedgerEntry[]) => {
+    setEntries(entries);
+    setActiveTab('Refinement');
+  };
+
+  const handleSignalUpdate = (key: keyof IncentiveSignals, value: boolean) => {
+    setSignals(prev => ({ ...prev, [key]: value }));
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans tracking-tight">
-      <div className="max-w-7xl mx-auto p-8">
-        <header className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tighter">MYAUDIT 🔍</h1>
-          <p className="text-slate-600">AI-Powered Forensic Audit & Tax Assistant</p>
-        </header>
-
-        <nav className="flex justify-center mb-8 p-1 bg-slate-100 rounded-lg w-max mx-auto">
-          {['extraction', 'refinement', 'risk simulator'].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab.replace(' ', '-') as 'extraction' | 'refinement' | 'risk-simulator')}
-              className={`px-6 py-2 text-sm font-semibold rounded-md capitalize ${
-                activeTab === tab.replace(' ', '-')
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-slate-500 hover:bg-slate-200'
-              }`}>
-              {tab}
-            </button>
-          ))}
-        </nav>
-
-        <main>
-          {renderContent()}
-        </main>
-      </div>
+    <div className="bg-slate-950 text-white min-h-screen font-sans">
+      <Header />
+      <main className="p-4 sm:p-6 lg:p-8">
+        <div className="flex space-x-4 mb-4">
+          <button onClick={() => handleTabChange('Profile')} className={`px-4 py-2 rounded ${activeTab === 'Profile' ? 'bg-blue-600' : 'bg-gray-700'}`}>Profile</button>
+          <button onClick={() => handleTabChange('Ingestion')} className={`px-4 py-2 rounded ${activeTab === 'Ingestion' ? 'bg-blue-600' : 'bg-gray-700'}`}>Ingestion</button>
+          <button onClick={() => handleTabChange('Extraction')} className={`px-4 py-2 rounded ${activeTab === 'Extraction' ? 'bg-blue-600' : 'bg-gray-700'}`}>Extraction</button>
+          <button onClick={() => handleTabChange('Refinement')} className={`px-4 py-2 rounded ${activeTab === 'Refinement' ? 'bg-blue-600' : 'bg-gray-700'}`}>Refinement</button>
+          <button onClick={() => handleTabChange('Tax')} className={`px-4 py-2 rounded ${activeTab === 'Tax' ? 'bg-blue-600' : 'bg-gray-700'}`}>Tax</button>
+        </div>
+        {activeTab === 'Profile' && <IncentiveProfile signals={signals} onUpdate={handleSignalUpdate} />}
+        {activeTab === 'Ingestion' && <DocumentUploader onExtractionComplete={handleEntriesExtracted} />}
+        {activeTab === 'Extraction' && <ExtractionResults transactions={entries} />}
+        {activeTab === 'Refinement' && <RefinementView entries={entries} />}
+        {activeTab === 'Tax' && <TaxView entries={entries} signals={signals} />}
+      </main>
     </div>
   );
-}
+};
 
 export default App;

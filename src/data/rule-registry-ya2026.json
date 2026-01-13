@@ -1,0 +1,6 @@
+[
+  { "ruleId": "ACA_2026", "triggerSignal": "usesAutomation", "shortName": "Automation Capital Allowance", "taxCode": "P.U.(A) 36/2018", "advisoryText": "Based on your AI/Automation usage, you may qualify for a 200% capital allowance. This can include MYAUDIT software costs." },
+  { "ruleId": "RA_2026", "triggerSignal": "reinvestsInAssets", "shortName": "Reinvestment Allowance", "taxCode": "ITA 1967 Sch 7A", "advisoryText": "Reinvesting in production may lower your taxable profit. Discuss eligibility with your agent." },
+  { "ruleId": "OKU_2026", "triggerSignal": "employsDisabledStaff", "shortName": "Disabled Staff Deduction", "taxCode": "P.U.(A) 73/2019", "advisoryText": "You can claim a double deduction for the salaries of registered disabled employees." },
+  { "ruleId": "SVA_2026", "triggerSignal": "frequentSmallAssets", "shortName": "Small Value Assets", "taxCode": "Paragraph 19A", "advisoryText": "Equipment under RM 2,000 can be fully written off in one year rather than over time." }
+]

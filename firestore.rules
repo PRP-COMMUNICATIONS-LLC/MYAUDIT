@@ -1,21 +1,42 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Guardian Governance: Tier 2 Hard-Block for MYAUDIT v1.2
-    match /ledgers/{year}/entries/{entryId} {
-      
-      // allow read access for authenticated owners
-      allow read: if request.auth != null;
 
-      // Tier 2: Block ALL updates to entries marked as LOCKED_FOR_AUDIT
-      allow update: if request.auth != null && 
-                    resource.data.status != "LOCKED_FOR_AUDIT";
-
-      // Tier 2: Enforce e-invoice requirement for transactions > RM 10k
-      allow create: if request.auth != null &&
-                    (request.resource.data.amount <= 10000 || 
-                     request.resource.data.eInvoiceRef != null);
+    // Default deny all reads/writes, unless explicitly allowed.
+    match /{document=**} {
+      allow read, write: if false;
     }
+
+    // Allow authenticated users to read and write to the 'transactions' collection
+    match /transactions/{transactionId} {
+      allow read, delete: if request.auth != null;
+      
+      // On create or update, validate the data with our function
+      allow write: if request.auth != null && isValidTransaction();
+    }
+  }
+
+  function isValidTransaction() {
+    let transaction = request.resource.data;
+
+    // Basic data integrity checks
+    let isStructurallySound = transaction.description is string &&
+                              transaction.debit is number &&
+                              transaction.credit is number &&
+                              transaction.date is string &&
+                              transaction.category is string &&
+                              transaction.status is string;
+
+    // **Staff Welfare Compliance Rule**
+    // PREVENT a 'Staff Welfare' transaction from being marked 'AUDIT_READY'
+    // if its debit value exceeds the 5000 threshold.
+    // It must be submitted with a different status (e.g., 'New') to be
+    // processed and flagged correctly by the backend Cloud Function.
+    let isWelfareCompliant = !(transaction.category == 'Staff Welfare' &&
+                               transaction.debit > 5000 &&
+                               transaction.status == 'AUDIT_READY');
+
+    return isStructurallySound && isWelfareCompliant;
   }
 }

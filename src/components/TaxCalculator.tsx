@@ -52,8 +52,12 @@ const TaxCalculator: React.FC = () => {
     const eis = socsoEisSalaryCap * eisRate;
     const totalDeductions = epf + socso + eis;
     const netPay = grossSalary - totalDeductions;
+    const taxableIncome = grossSalary * 12;
+    const estimatedTax = taxableIncome * 0.1; // Dummy tax rate
 
     return {
+        taxableIncome,
+        estimatedTax,
         grossSalary,
         netPay,
         deductions: {

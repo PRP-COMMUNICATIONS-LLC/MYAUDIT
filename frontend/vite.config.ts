@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: true,
-    port: 5173, // Forces the server back to the port the workstation expects
+    port: 5173,
     hmr: {
       protocol: 'wss',
       clientPort: 443

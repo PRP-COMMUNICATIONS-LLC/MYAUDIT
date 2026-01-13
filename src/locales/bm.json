@@ -1,0 +1,15 @@
+{
+  "MrRpp.AdvisoryTitle": "Nasihat Cukai Mr R.P.P",
+  "MrRpp.Disclaimer": "PENAFIAN: Ini adalah panduan perancangan berdasarkan peraturan cukai umum Malaysia. Sahkan dengan ejen cukai berlesen sebelum memfailkan. Bukan nasihat profesional.",
+  "MrRpp.NoIncentives": "Tiada insentif khusus yang dikesan daripada profil.",
+  "AutomationCapitalAllowance.shortName": "Elaun Modal Automasi",
+  "AutomationCapitalAllowance.advisoryText": "Berdasarkan penggunaan AI/Automasi anda, anda mungkin layak untuk elaun modal 200%. Ini boleh termasuk kos perisian MYAUDIT.",
+  "ReinvestmentAllowance.shortName": "Elaun Pelaburan Semula",
+  "ReinvestmentAllowance.advisoryText": "Melabur semula dalam pengeluaran boleh mengurangkan keuntungan bercukai anda. Bincangkan kelayakan dengan ejen anda.",
+  "DisabledStaffDeduction.shortName": "Potongan Kakitangan Kurang Upaya",
+  "DisabledStaffDeduction.advisoryText": "Anda boleh menuntut potongan dua kali untuk gaji pekerja kurang upaya yang berdaftar.",
+  "SmallValueAssets.shortName": "Aset Bernilai Kecil",
+  "SmallValueAssets.advisoryText": "Peralatan di bawah RM 2,000 boleh dihapus kira sepenuhnya dalam satu tahun dan bukannya dari masa ke masa.",
+  "AutomationCASavings.title": "Penjimatan CA Automasi",
+  "AutomationCASavings.description": "Anggaran penjimatan cukai daripada pembelian aset yang layak untuk Elaun Modal Automasi."
+}

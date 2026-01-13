@@ -1,19 +1,77 @@
-
-import React from 'react';
+import React, { useMemo } from 'react';
 import { LedgerEntry, DieFlag } from '../../types';
 
 interface AouthaProps {
   entries: LedgerEntry[];
-  dieFlags?: DieFlag[];
 }
 
+// Rule constants
 const DOCUMENT_GAP_THRESHOLD = 500;
+const LARGE_ENTERTAINMENT_THRESHOLD = 1000;
+const SIGNIFICANT_REPAIR_THRESHOLD = 5000;
 
-const AouthaPanel: React.FC<AouthaProps> = ({ entries, dieFlags = [] }) => {
-  // Original filter logic
+// DIE Hint Generation Logic
+const generateDieHints = (entries: LedgerEntry[]): DieFlag[] => {
+  const hints: DieFlag[] = [];
+
+  for (const entry of entries) {
+    const debit = entry.debit ?? 0;
+
+    // Rule 1: Large Entertainment Expense
+    if (entry.category === 'Entertainment' && debit > LARGE_ENTERTAINMENT_THRESHOLD) {
+      hints.push({
+        id: entry.id!,
+        entryId: entry.id!,
+        title: 'Large Entertainment Expense',
+        message: `Entertainment expense of RM ${debit} is flagged. Client entertainment is 50% deductible, but staff entertainment may be 100% deductible. Please verify and re-categorize if for staff.`,
+        suggestion: `Entertainment expense of RM ${debit} is flagged. Client entertainment is 50% deductible, but staff entertainment may be 100% deductible. Please verify and re-categorize if for staff.`,
+        estimatedImpact: `Potential RM ${debit * 0.5} increase in deduction.`,
+        flagType: 'risk',
+        confidence: 'medium',
+        createdAt: new Date().toISOString(),
+      });
+    }
+
+    // Rule 2: Potential Capital Improvement
+    if (entry.category === 'Repairs & Maintenance' && debit > SIGNIFICANT_REPAIR_THRESHOLD) {
+      hints.push({
+        id: entry.id!,
+        entryId: entry.id!,
+        title: 'Potential Capital Improvement',
+        message: `A repair of RM ${debit} seems significant. If this was an improvement that extends the asset's life or value, it should be capitalized, not expensed. Please verify.`,
+        suggestion: `A repair of RM ${debit} seems significant. If this was an improvement that extends the asset's life or value, it should be capitalized, not expensed. Please verify.`,
+        estimatedImpact: `Correction may impact taxable profit by RM ${debit}.`,
+        flagType: 'risk',
+        confidence: 'high',
+        createdAt: new Date().toISOString(),
+      });
+    }
+
+    // Rule 3: Donation Verification
+    if (entry.category === 'Donations') {
+      hints.push({
+        id: entry.id!,
+        entryId: entry.id!,
+        title: 'Donation Verification',
+        message: `Donation of RM ${debit} recorded. Tax deductions for donations are only allowed for contributions to LHDN-approved institutions. Please verify the recipient's approval status.`,
+        suggestion: `Donation of RM ${debit} recorded. Tax deductions for donations are only allowed for contributions to LHDN-approved institutions. Please verify the recipient's approval status.`,
+        estimatedImpact: `Confirming deductibility protects taxable profit of RM ${debit}.`,
+        flagType: 'risk',
+        confidence: 'high',
+        createdAt: new Date().toISOString(),
+      });
+    }
+  }
+
+  return hints;
+};
+
+const AouthaPanel: React.FC<AouthaProps> = ({ entries }) => {
+  // Generate DIE flags internally based on entries
+  const dieFlags = useMemo(() => generateDieHints(entries), [entries]);
+
   const docGaps = entries.filter(e =>
-    e.debit > DOCUMENT_GAP_THRESHOLD &&
-    (!e.supportingDocLinks || e.supportingDocLinks.length === 0)
+    (e.debit ?? 0) > DOCUMENT_GAP_THRESHOLD
   );
 
   const uncategorized = entries.filter(e => e.category === 'Uncategorized');
@@ -22,7 +80,6 @@ const AouthaPanel: React.FC<AouthaProps> = ({ entries, dieFlags = [] }) => {
     <div className="bg-white dark:bg-slate-900 border-l border-slate-200 p-6 h-full shadow-lg">
       <h2 className="text-lg font-bold mb-6 text-slate-800 dark:text-slate-100 uppercase tracking-tight">The Aoutha</h2>
       
-      {/* DIE Insights Section */}
       {dieFlags.length > 0 && (
         <div className="mb-8 p-4 bg-sky-50 rounded-lg border border-sky-200">
           <p className="text-xs text-sky-700 font-bold uppercase">Deductibility Insights</p>
@@ -30,8 +87,7 @@ const AouthaPanel: React.FC<AouthaProps> = ({ entries, dieFlags = [] }) => {
           <div className="space-y-3">
             {dieFlags.map((flag, index) => (
               <div key={index} className="text-sm text-slate-700 dark:text-slate-300">
-                <p className='font-semibold'>Suggestion:</p>
-                <p>{flag.suggestion}</p>
+                <p className='font-semibold'>{flag.suggestion}</p>
                 <p className="text-xs text-slate-500 mt-1">{flag.estimatedImpact}</p>
               </div>
             ))}
@@ -39,10 +95,9 @@ const AouthaPanel: React.FC<AouthaProps> = ({ entries, dieFlags = [] }) => {
         </div>
       )}
 
-      {/* Original Document Gaps and Uncategorized Items Section */}
       <div className="space-y-4">
         <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
-          <p className="text-xs text-amber-700 font-bold uppercase">Document Gaps (&gt;RM500)</p>
+          <p className="text-xs text-amber-700 font-bold uppercase">Document Gaps (&gt;RM{DOCUMENT_GAP_THRESHOLD})</p>
           <p className="text-2xl font-black text-amber-900">{docGaps.length}</p>
         </div>
         <div className="p-4 bg-red-50 rounded-lg border border-red-200">
