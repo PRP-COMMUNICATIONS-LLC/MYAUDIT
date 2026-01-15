@@ -1,4 +1,5 @@
 import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
@@ -12,6 +13,19 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
+// Initialize Firebase app
 const app = initializeApp(firebaseConfig);
+
+// Initialize Auth
+export const auth = getAuth(app);
+
+// Initialize Firestore with Singapore (asia-southeast1) region for data residency
 export const db = getFirestore(app);
+// Note: Region configuration is set at the Firestore database level in Firebase Console
+// This ensures all data resides in asia-southeast1 (Singapore) per data residency requirements
+
+// Initialize Storage
 export const storage = getStorage(app);
+
+// Export app instance for additional Firebase services if needed
+export default app;

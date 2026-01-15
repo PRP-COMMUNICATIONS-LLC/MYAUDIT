@@ -20,7 +20,7 @@ export const TransactionRow: React.FC<TransactionRowProps> = ({ entry }) => {
 
             {/* Date */}
             <div className="col-span-1 text-sm text-slate-500 font-medium">
-                {(entry as any).date ? new Date((entry as any).date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}
+                {entry.date ? new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}
             </div>
 
             {/* Description */}

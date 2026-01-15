@@ -2,20 +2,31 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Guardian Governance: Tier 2 Hard-Block for MYAUDIT v1.2
-    match /ledgers/{year}/entries/{entryId} {
+    // YA 2026 Forensic Ledger Guardrails
+    match /artifacts/{appId}/public/data/ledgerEntries/{docId} {
       
-      // allow read access for authenticated owners
+      // SENTINEL: Authorative Read/Write
       allow read: if request.auth != null;
+      
+      allow create, update: if request.auth != null 
+        && isValidLedgerEntry(request.resource.data)
+        && !isLocked(resource.data);
 
-      // Tier 2: Block ALL updates to entries marked as LOCKED_FOR_AUDIT
-      allow update: if request.auth != null && 
-                    resource.data.status != "LOCKED_FOR_AUDIT";
+      // Rule 1: Immutable Approval (FOUNDER LOCK)
+      function isLocked(data) {
+        return data != null && data.auditStatus == 'APPROVED';
+      }
 
-      // Tier 2: Enforce e-invoice requirement for transactions > RM 10k
-      allow create: if request.auth != null &&
-                    (request.resource.data.amount <= 10000 || 
-                     request.resource.data.eInvoiceRef != null);
+      // Rule 2: Mandatory Documentation for RM 500+ Threshold
+      function isValidLedgerEntry(data) {
+        return data.amount is number 
+          && (data.amount <= 500 || (data.amount > 500 && data.supportingDocLinks is list && data.supportingDocLinks.size() > 0));
+      }
+    }
+    
+    // Default Deny
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

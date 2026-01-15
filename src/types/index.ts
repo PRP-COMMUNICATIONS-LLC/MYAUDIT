@@ -12,6 +12,7 @@ export interface DieFlag {
 /**
  * Represents a single transaction or journal entry in the ledger.
  * Extended with metadata for the Deductibility Insight Engine (DIE).
+ * Extended for MPERS-aligned forensic substrate (v1.2).
  */
 export interface LedgerEntry {
   id: string;
@@ -30,6 +31,11 @@ export interface LedgerEntry {
   sourceEvidence?: string[] | null;
   dieFlags?: DieFlag[];
   eInvoiceStatus?: 'valid' | 'missing' | 'warning';
+  // MPERS-aligned forensic substrate fields (v1.2)
+  date?: string; // ISO date format
+  docRef?: string; // Document reference
+  accountCode?: number; // 1000-9999 range for MPERS substrate
+  accountName?: string; // Account name
 }
 
 /**

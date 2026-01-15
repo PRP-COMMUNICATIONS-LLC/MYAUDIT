@@ -1,1 +1,0 @@
-src/components/TaxCalculator.tsx(131,118): error TS1003: Identifier expected.
