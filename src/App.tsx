@@ -6,7 +6,6 @@ import {
   FileText, 
   Download, 
   AlertCircle, 
-  Lock, 
   Database,
   Search,
   ArrowRightLeft,
@@ -34,6 +33,8 @@ import {
 } from './types/index';
 import { auth } from './firebase';
 import { signInAnonymously, onAuthStateChanged, User } from 'firebase/auth';
+import SovereignHeader from './components/layout/SovereignHeader';
+import TabRail from './components/layout/TabRail';
 
 // --- YEAR TRANSITION SCREEN COMPONENT ---
 const YearTransitionScreen: React.FC<{ isVisible: boolean; onComplete: () => void }> = ({ isVisible, onComplete }) => {
@@ -156,14 +157,6 @@ const massiveActivationYA2017: LedgerEntry[] = [
   }
 ];
 
-// --- TABS CONSTANT ---
-const TABS = [
-  { id: 1, label: 'Setup', icon: Database },
-  { id: 2, label: 'Extraction', icon: Search },
-  { id: 3, label: 'Review & Verify', icon: Activity },
-  { id: 4, label: 'Tax Planning', icon: TrendingUp },
-  { id: 5, label: 'Export', icon: Download },
-];
 
 // --- MAIN APP COMPONENT ---
 export default function App() {
@@ -297,19 +290,6 @@ export default function App() {
     danger: '#B91C1C'
   };
 
-  const TabButton = ({ id, label, icon: Icon, color }: { id: number; label: string; icon: React.ComponentType<{ size?: number; className?: string; style?: React.CSSProperties }>; color: string }) => (
-    <button
-      onClick={() => setActiveTab(id)}
-      className={`flex flex-col items-center justify-center p-3 transition-all duration-300 relative
-        ${activeTab === id ? 'text-white' : 'text-slate-500 hover:text-white'}`}
-    >
-      <Icon size={22} style={{ color: activeTab === id ? color : 'inherit' }} />
-      <span className="text-[9px] mt-1.5 font-black uppercase tracking-widest">{label}</span>
-      {activeTab === id && (
-        <div className="absolute -bottom-1 w-8 h-0.5" style={{ backgroundColor: color }}></div>
-      )}
-    </button>
-  );
 
   return (
     <div className="min-h-screen flex flex-col font-sans selection:bg-cyan-500/30" style={{ backgroundColor: colors.charcoal, color: colors.white }}>
@@ -318,44 +298,7 @@ export default function App() {
       {!showIntro && (
         <>
           {/* --- SOVEREIGN HEADER --- */}
-          <header className="h-20 border-b border-white/5 flex items-center justify-between px-10 bg-black/40 backdrop-blur-xl sticky top-0 z-50">
-            <div className="flex flex-col">
-              <div className="flex items-baseline font-sans text-2xl font-black uppercase tracking-tighter">
-                <span>MY</span>
-                <span 
-                  className="font-sans text-[1.1em] font-black leading-none" 
-                  style={{ 
-                    color: colors.cyan, 
-                    transform: 'scaleY(1.05) translateY(0.02em)', 
-                    transformOrigin: 'center baseline', 
-                    display: 'inline-block',
-                    margin: '0 -0.02em'
-                  }}
-                >
-                  Λ
-                </span>
-                <span>UDIT</span>
-              </div>
-              <p className="text-[9px] text-cyan-400 font-bold tracking-[0.3em] uppercase mt-1">Sovereign Identity Architecture v2.2</p>
-            </div>
-
-            <div className="flex items-center gap-10">
-              <div className="hidden lg:flex flex-col items-end">
-                <div className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: colors.cyan }}></div>
-                  <span className="text-[10px] font-black tracking-widest uppercase text-white">SENTINEL v1.0 ACTIVE</span>
-                </div>
-                <span className="text-[8px] text-slate-500 uppercase font-black mt-1">asia-southeast1: authoritative instance</span>
-              </div>
-              <div className="h-8 w-[1px] bg-white/10"></div>
-              {user && (
-                <div className="text-[9px] text-slate-400 uppercase font-black">
-                  {user.isAnonymous ? 'GUEST' : user.email?.split('@')[0] || 'USER'}
-                </div>
-              )}
-              <Lock size={20} className={isAuditMode ? "text-emerald-500" : "text-slate-600"} />
-            </div>
-          </header>
+          <SovereignHeader user={user} isAuditMode={isAuditMode} />
 
           {/* --- MAIN WORKFLOW CANVAS --- */}
           <main className="flex-1 overflow-y-auto p-10 max-w-6xl mx-auto w-full">
@@ -588,17 +531,7 @@ export default function App() {
           </main>
 
           {/* --- SOVEREIGN NAVIGATION --- */}
-          <nav className="h-24 border-t border-white/10 bg-black/60 backdrop-blur-2xl flex items-center justify-center gap-16 sticky bottom-0 z-50">
-            {TABS.map((tab) => (
-              <TabButton 
-                key={tab.id} 
-                id={tab.id} 
-                label={tab.label} 
-                icon={tab.icon} 
-                color={tab.id === 3 ? '#A78BFA' : tab.id === 4 ? colors.success : tab.id === 5 ? colors.warning : colors.cyan} 
-              />
-            ))}
-          </nav>
+          <TabRail activeTab={activeTab} onTabChange={setActiveTab} />
 
           <footer className="bg-black py-10 border-t border-white/10 px-10">
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
