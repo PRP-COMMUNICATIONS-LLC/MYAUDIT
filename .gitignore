@@ -21,3 +21,15 @@ logs/
 *.log*
 firebase-debug.log*
 service-account-key.json
+
+# MYAUDIT local artifacts
+TFVars*
+Terraform Variables
+firestore-creation-audit-*.txt
+
+# Build outputs
+backend/functions/lib/
+infrastructure/terraform/plan.tfplan
+
+# Secrets (never commit)
+github-ci-key.json
