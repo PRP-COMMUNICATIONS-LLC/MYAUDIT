@@ -1,0 +1,38 @@
+[
+  {
+    "id": "txn_001",
+    "transactionId": "txn_ref_001",
+    "yearId": "fy2026",
+    "date": "2026-01-15",
+    "description": "ANNUAL STAFF DINNER",
+    "debit": 100000.00,
+    "credit": 0,
+    "category": "Entertainment",
+    "status": "AUTO_TAGGED",
+    "eInvoiceStatus": "PENDING",
+    "supportingDocLinks": [],
+    "dieFlags": [
+      {
+        "flagType": "MISCLASSIFICATION_RISK",
+        "suggestion": "Consider Staff Welfare instead of Entertainment",
+        "estimatedImpact": "Could increase deductible amount from 50% to 100%",
+        "confidence": 0.85,
+        "createdAt": 1705084800
+      }
+    ]
+  },
+  {
+    "id": "txn_002",
+    "transactionId": "txn_ref_002",
+    "yearId": "fy2026",
+    "date": "2026-02-20",
+    "description": "Purchase of CNC Automation Robot",
+    "debit": 150000.00,
+    "credit": 0,
+    "category": "Capital Expenditure",
+    "status": "AUTO_TAGGED",
+    "eInvoiceStatus": "VALID",
+    "confidence": 0.98,
+    "supportingDocLinks": ["/docs/invoice_robot_2026.pdf"]
+  }
+]

@@ -1,32 +1,42 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // YA 2026 Forensic Ledger Guardrails
-    match /artifacts/{appId}/public/data/ledgerEntries/{docId} {
-      
-      // SENTINEL: Authorative Read/Write
-      allow read: if request.auth != null;
-      
-      allow create, update: if request.auth != null 
-        && isValidLedgerEntry(request.resource.data)
-        && !isLocked(resource.data);
 
-      // Rule 1: Immutable Approval (FOUNDER LOCK)
-      function isLocked(data) {
-        return data != null && data.auditStatus == 'APPROVED';
-      }
-
-      // Rule 2: Mandatory Documentation for RM 500+ Threshold
-      function isValidLedgerEntry(data) {
-        return data.amount is number 
-          && (data.amount <= 500 || (data.amount > 500 && data.supportingDocLinks is list && data.supportingDocLinks.size() > 0));
-      }
-    }
-    
-    // Default Deny
+    // Default deny all reads/writes, unless explicitly allowed.
     match /{document=**} {
       allow read, write: if false;
     }
+
+    // Allow authenticated users to read and write to the 'transactions' collection
+    match /transactions/{transactionId} {
+      allow read, delete: if request.auth != null;
+      
+      // On create or update, validate the data with our function
+      allow write: if request.auth != null && isValidTransaction();
+    }
+  }
+
+  function isValidTransaction() {
+    let transaction = request.resource.data;
+
+    // Basic data integrity checks
+    let isStructurallySound = transaction.description is string &&
+                              transaction.debit is number &&
+                              transaction.credit is number &&
+                              transaction.date is string &&
+                              transaction.category is string &&
+                              transaction.status is string;
+
+    // **Staff Welfare Compliance Rule**
+    // PREVENT a 'Staff Welfare' transaction from being marked 'AUDIT_READY'
+    // if its debit value exceeds the 5000 threshold.
+    // It must be submitted with a different status (e.g., 'New') to be
+    // processed and flagged correctly by the backend Cloud Function.
+    let isWelfareCompliant = !(transaction.category == 'Staff Welfare' &&
+                               transaction.debit > 5000 &&
+                               transaction.status == 'AUDIT_READY');
+
+    return isStructurallySound && isWelfareCompliant;
   }
 }

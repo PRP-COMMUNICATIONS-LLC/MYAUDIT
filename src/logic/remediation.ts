@@ -11,21 +11,25 @@ export function mapEntriesToTasks(entries: LedgerEntry[]): RemediationTask[] {
     const tasks: RemediationTask[] = [];
 
     for (const entry of entries) {
-        if (entry.debit > 500 && (!entry.supportingDocLinks || entry.supportingDocLinks.length === 0)) {
+        const debit = entry.debit ?? 0;
+        const description = entry.description ?? '';
+        const category = entry.category ?? '';
+        
+        if (debit > 500 && (!entry.supportingDocLinks || entry.supportingDocLinks.length === 0)) {
             tasks.push({
-                id: entry.id,
-                description: entry.description,
+                id: entry.id!,
+                description: description,
                 reason: 'MISSING_DOC',
-                simulatedSavings: entry.debit * 0.24,
+                simulatedSavings: debit * 0.24,
             });
         }
 
-        if (entry.category === 'Uncategorized') {
+        if (category === 'Uncategorized') {
             tasks.push({
-                id: entry.id,
-                description: entry.description,
+                id: entry.id!,
+                description: description,
                 reason: 'UNCATEGORIZED',
-                simulatedSavings: entry.debit * 0.24,
+                simulatedSavings: debit * 0.24,
             });
         }
     }

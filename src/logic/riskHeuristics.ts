@@ -1,20 +1,29 @@
-import { LedgerEntry, RuleRegistry, DieFlag } from "../types";
+import { LedgerEntry, DieFlag } from "../types";
 
-export function detectMisclassifications(entry: LedgerEntry, rules: RuleRegistry[]): DieFlag[] {
+const MISCLASSIFICATION_KEYWORDS: { keyword: string, category: string }[] = [
+    { keyword: 'training', category: 'Staff Training' },
+    { keyword: 'software', category: 'Software/Tools' },
+    { keyword: 'consulting', category: 'Consulting' },
+];
+
+export function detectMisclassifications(entry: LedgerEntry): DieFlag[] {
     const flags: DieFlag[] = [];
+    const description = entry.description ?? '';
 
-    for (const rule of rules) {
-        const keywordMatch = rule.conditions.keywords.some(keyword => 
-            entry.description.toLowerCase().includes(keyword.toLowerCase())
-        );
+    for (const { keyword, category } of MISCLASSIFICATION_KEYWORDS) {
+        const hasKeyword = description.toLowerCase().includes(keyword.toLowerCase());
 
-        if (keywordMatch && entry.category !== rule.conditions.category) {
+        if (hasKeyword && entry.category !== category) {
             flags.push({
+                id: `${entry.id}-misclass`,
+                entryId: entry.id!,
+                title: 'Potential Misclassification',
+                message: `Entry \"${description}\" might be miscategorized. Expected ${category}, but found ${entry.category}.`,
                 flagType: "MISCLASSIFICATION_RISK",
-                suggestion: `Entry "${entry.description}" might be miscategorized. Expected ${rule.conditions.category}, but found ${entry.category}.`,
-                estimatedImpact: `Potential tax impact depends on category change.`,
+                suggestion: `Re-categorize to \"${category}\".`,
+                estimatedImpact: "Varies",
                 confidence: 0.8,
-                createdAt: Date.now(),
+                createdAt: new Date().toISOString(),
             });
         }
     }
@@ -23,12 +32,13 @@ export function detectMisclassifications(entry: LedgerEntry, rules: RuleRegistry
 }
 
 export function estimateRiskSimulation(entries: LedgerEntry[]) {
-    const highRiskEntries = entries.filter(e => 
-        (e.debit > 500 && (!e.supportingDocLinks || e.supportingDocLinks.length === 0)) ||
-        e.category === 'Uncategorized'
-    );
+    const highRiskEntries = entries.filter(e => {
+        const debit = e.debit ?? 0;
+        return (debit > 500 && (!e.supportingDocLinks || e.supportingDocLinks.length === 0)) ||
+               e.category === 'Uncategorized';
+    });
 
-    const estimatedExposure = highRiskEntries.reduce((acc, entry) => acc + entry.debit, 0);
+    const estimatedExposure = highRiskEntries.reduce((acc, entry) => acc + (entry.debit ?? 0), 0);
     const simulatedLeakage = estimatedExposure * 0.24; // 24% tax rate
 
     return {

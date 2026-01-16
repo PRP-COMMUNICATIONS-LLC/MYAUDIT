@@ -1,49 +1,63 @@
-
-import React, { useState, useEffect } from 'react';
-import AouthaPanel from '../components/aoutha/AouthaPanel';
-import { useLedgerEntries } from '../hooks/useLedgerEntries';
-import { detectMisclassifications } from '../logic/riskHeuristics';
-import { DieFlag, LedgerEntry, RuleRegistry } from '../types';
-
-// Directly import the rules from the JSON file.
-// Make sure your build process supports JSON imports.
-import rules from '../../rule-registry-ya2026.json';
+import React from 'react';
 
 const RefinementView: React.FC = () => {
-  const { entries, loading } = useLedgerEntries('ya2026');
-  const [dieFlags, setDieFlags] = useState<DieFlag[]>([]);
-
-  useEffect(() => {
-    if (entries && entries.length > 0) {
-      // The rules are typed as any by default when imported from JSON, so we cast them.
-      const typedRules = rules as RuleRegistry[];
-
-      // Run the DIE logic for each ledger entry.
-      const allFlags = entries.flatMap((entry: LedgerEntry) =>
-        detectMisclassifications(entry, typedRules)
-      );
-
-      setDieFlags(allFlags);
-    }
-  }, [entries]); // Re-run the effect when entries change.
-
-  if (loading) return <div>Synchronizing with MYAUDIT Cloud...</div>;
-
   return (
-    <div className="grid grid-cols-4 gap-4">
-      <div className="col-span-3">
-        <h1 className="text-2xl font-bold mb-4">Refinement View</h1>
-        <p>Ledger Table Area (Refinement Phase)</p>
-        {/*
-          Here you would display the ledger entries.
-          You could highlight entries that have associated flags from the DIE.
-          For example: entry.id is in dieFlags.map(f => f.ledgerEntryId)
-        */}
+    <div className="font-display">
+      <div className="mb-10">
+        <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-3">Stage 3: Refinement</h2>
+        <p className="text-slate-500 text-lg font-light leading-relaxed">
+          Review and approve AI-driven suggestions from the Deductibility Insight Engine (DIE).
+        </p>
       </div>
-      <div className="col-span-1">
-        {/* Pass the detected flags to the AouthaPanel.
-            AouthaPanel will need to be updated to display these insights. */}
-        <AouthaPanel entries={entries} dieFlags={dieFlags} />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white p-8 rounded-xl border border-slate-200 shadow-sm">
+        {/* Left Pane: Original Entry */}
+        <div className="p-6 bg-slate-50 rounded-lg border border-slate-200">
+          <h4 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Original Entry</h4>
+          <div className="space-y-4 text-sm">
+            <div>
+              <p className="font-bold text-slate-800">Transaction ID</p>
+              <p className="font-mono text-slate-600">TXN-2025-4A8B</p>
+            </div>
+            <div>
+              <p className="font-bold text-slate-800">Amount</p>
+              <p className="text-slate-600">RM 1,200.00</p>
+            </div>
+            <div>
+              <p className="font-bold text-slate-800">Original GL Code</p>
+              <p className="text-slate-600">6300 - Entertainment</p>
+            </div>
+            <div>
+              <p className="font-bold text-slate-800">Vendor</p>
+              <p className="text-slate-600">The Grand Restaurant</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Pane: AI Suggestion */}
+        <div className="p-6 bg-blue-50 rounded-lg border border-blue-200">
+          <h4 className="text-sm font-bold text-blue-500 uppercase tracking-widest mb-4">AI Suggested Reclassification</h4>
+          <div className="space-y-4 text-sm">
+             <div>
+              <p className="font-bold text-blue-900">Suggested GL Code</p>
+              <p className="text-blue-700">6150 - Staff Welfare & Benefits</p>
+            </div>
+             <div>
+              <p className="font-bold text-blue-900">Deductibility Status</p>
+              <p className="font-mono text-blue-700">100% Deductible</p>
+            </div>
+            <div className="p-4 bg-white/70 rounded-md">
+              <p className="font-bold text-blue-900 mb-2">Justification</p>
+              <p className="text-slate-700 leading-relaxed">
+                The Aoutha engine cross-referenced this invoice with employee timesheets. The attendees were all staff members, making this a "Staff Welfare" event, not "Entertainment".
+              </p>
+            </div>
+            <div className="flex gap-4 pt-4">
+                <button className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-bold">Approve</button>
+                <button className="flex-1 border border-slate-300 text-slate-600 px-4 py-2 rounded-lg font-medium">Reject</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,0 +1,15 @@
+{
+  "MrRpp.AdvisoryTitle": "Mr R.P.P 税务咨询",
+  "MrRpp.Disclaimer": "免责声明：这是根据马来西亚一般税务规则制定的规划指南。在提交之前，请与持牌税务代理人确认。不是专业建议。",
+  "MrRpp.NoIncentives": "未从个人资料中检测到特定的激励措施。",
+  "AutomationCapitalAllowance.shortName": "自动化资本津贴",
+  "AutomationCapitalAllowance.advisoryText": "根据您的 AI/自动化使用情况，您可能有资格获得 200% 的资本津贴。这可能包括 MYAUDIT 软件成本。",
+  "ReinvestmentAllowance.shortName": "再投资津贴",
+  "ReinvestmentAllowance.advisoryText": "对生产进行再投资可以降低您的应税利润。与您的代理人讨论资格。",
+  "DisabledStaffDeduction.shortName": "残疾员工扣除",
+  "DisabledStaffDeduction.advisoryText": "您可以为已注册的残疾员工的工资申请双重扣除。",
+  "SmallValueAssets.shortName": "小额资产",
+  "SmallValueAssets.advisoryText": "价值低于 2,000 令吉的设备可以在一年内完全注销，而不是随着时间的推移。",
+  "AutomationCASavings.title": "自动化 CA 节省",
+  "AutomationCASavings.description": "从符合自动化资本津贴资格的资产购买中估算的税收节省。"
+}
