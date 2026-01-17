@@ -2,35 +2,34 @@ name: Guardian Deployment & Verification
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   deploy_and_verify:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      - name: 🛰️ Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install Dependencies
+      - name: 🛠️ Install Dependencies
         run: npm install
 
-      - name: Build Production Assets
+      - name: 🏗️ Build Production Assets
         run: npm run build
 
-      - name: Authenticate with Google Cloud
-        uses: google-github-actions/auth@v2
+      - name: 🔐 Authenticate with Google Cloud
+        uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}'
 
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+      - name: ☁️ Set up Cloud SDK
+        uses: 'google-github-actions/setup-gcloud@v2'
 
       - name: 🛡️ SENTINEL: Verify Sovereign Substrate
         run: |
@@ -47,11 +46,11 @@ jobs:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
           PROJECT_ID: rpr-myaudit
 
-      - name: 📍 Verify Post-Deployment Regional Lock
+      - name: 📍 Post-Deployment Regional Audit
         run: |
           LOCATION=$(gcloud firestore databases list --project=rpr-myaudit --format="value(locationId)" --filter="name:default")
           echo "Current Location: $LOCATION"
           if [ "$LOCATION" != "asia-southeast1" ]; then
-            echo "CRITICAL: Post-deployment regional mismatch detected!"
+            echo "CRITICAL: Sovereign Substrate Violation Detected ($LOCATION)"
             exit 1
           fi
