@@ -1,4 +1,4 @@
-name: Deploy to Firebase Hosting and Functions
+name: Deploy RPR-KONTROL Dashboard
 
 on:
   push:
@@ -6,35 +6,25 @@ on:
       - main
 
 jobs:
-  build_and_deploy:
+  build_and_deploy_kontrol:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install Frontend Dependencies
+      - name: Install dependencies
         run: npm install
 
-      - name: Build Frontend
-        run: npm run build
-
-      - name: Install Functions Dependencies
-        run: |
-          cd backend/functions
-          npm install
-
-      - name: Deploy to Firebase
-        uses: w9jds/firebase-action@master
-        with:
-          args: deploy --only hosting,functions
+      - name: Build RPR-KONTROL Dashboard
+        run: BUILD_OUTPUT_DIR=dist-kontrol npm run build
         env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          # Ensures the deployment targets the correct regional functions
-          PROJECT_ID: myaudit-59914983-2ad0f
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+      - name: Deploy to Firebase Hosting (kontrol)
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_TOKEN }}'
+          channelId: live
+          projectId: rpr-myaudit
+          target: kontrol

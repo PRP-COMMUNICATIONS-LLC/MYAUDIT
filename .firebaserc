@@ -1,6 +1,6 @@
 {
   "projects": {
-    "default": "myaudit-59914983-2ad0f"
+    "default": "rpr-myaudit"
   },
   "targets": {
     "rpr-myaudit": {
@@ -9,7 +9,6 @@
           "rpr-myaudit"
         ],
         "kontrol": [
-          "myaudit-kontrol",
           "myaudit-kontrol-dashboard"
         ]
       }
