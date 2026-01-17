@@ -35,6 +35,7 @@ import { auth } from './firebase';
 import { signInWithEmailAndPassword, onAuthStateChanged, User } from 'firebase/auth';
 import SovereignHeader from './components/layout/SovereignHeader';
 import TabRail from './components/layout/TabRail';
+import TaxView from './views/TaxView';
 
 // --- YEAR TRANSITION SCREEN COMPONENT ---
 const YearTransitionScreen: React.FC<{ isVisible: boolean; onComplete: () => void }> = ({ isVisible, onComplete }) => {
@@ -558,31 +559,7 @@ export default function App() {
 
             {/* TAB 4: TAX PLANNING */}
             {activeTab === 4 && (
-              <div className="space-y-8 animate-in fade-in duration-500">
-                <div className="border-l-4 border-emerald-500 pl-8 py-2">
-                  <h2 className="text-3xl font-black tracking-tighter uppercase">04 Tax Planning</h2>
-                  <p className="text-slate-500 text-sm mt-1 uppercase tracking-widest font-bold">Estimated Liability // Advisory Only</p>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="p-8 bg-black/20 border border-white/5 rounded-2xl">
-                    <p className="text-[10px] text-slate-500 uppercase font-black mb-1">Total Revenue</p>
-                    <p className="text-3xl font-black text-white">RM {taxStats.totalCredits.toLocaleString()}</p>
-                  </div>
-                  <div className="p-8 bg-black/20 border border-white/5 rounded-2xl">
-                    <p className="text-[10px] text-slate-500 uppercase font-black mb-1">Total Expenses</p>
-                    <p className="text-3xl font-black text-white">RM {taxStats.totalDebits.toLocaleString()}</p>
-                  </div>
-                  <div className="p-8 bg-cyan-900/10 border border-cyan-500/20 rounded-2xl">
-                    <p className="text-[10px] text-cyan-400 uppercase font-black mb-1">Estimated Tax</p>
-                    <p className="text-3xl font-black text-white">RM {taxStats.estimatedTax.toLocaleString()}</p>
-                    <p className="text-[10px] text-cyan-500/70 mt-2 font-bold uppercase tracking-widest">15% Flat Rate</p>
-                  </div>
-                </div>
-                <div className="p-6 bg-black/40 rounded-xl border border-white/5">
-                  <p className="text-[10px] text-slate-500 uppercase font-black mb-2">Net Income</p>
-                  <p className="text-2xl font-black text-white">RM {taxStats.netIncome.toLocaleString()}</p>
-                </div>
-              </div>
+                <TaxView />
             )}
 
             {/* TAB 5: EXPORT */}
