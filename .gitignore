@@ -1,50 +1,36 @@
+# Node
 node_modules/
 dist/
-build/
-.cache/
-.vite/
-.firebase/
-functions/lib/
-backend/functions/node_modules/
-frontend/node_modules/
-.vscode/
-.idea/
-.DS_Store
+dist-kontrol/
+npm-debug.log*
 .env
-.env.*
 .env.local
-*.log
-.cursor/
-.cursorrules
-.otlp/
-logs/
-*.log*
+
+# Firebase
+.firebase/
 firebase-debug.log*
-service-account-key.json
+firestore-debug.log*
+ui-debug.log*
 
-# MYAUDIT local artifacts
-TFVars*
-Terraform Variables
-firestore-creation-audit-*.txt
-
-# Build outputs
-backend/functions/lib/
-infrastructure/terraform/plan.tfplan
-
-# Terraform
+# Terraform (Sovereign Exclusion)
 .terraform/
-terraform.tfstate
-terraform.tfstate.backup
 *.tfstate
-*.tfstate.*
+*.tfstate.backup
+.terraform.lock.hcl
 
-# Secrets (never commit)
+# Secrets & Keys (TS-Λ3 Protection)
+secrets/
+rpr-myaudit-admin.json
 github-ci-key.json
-.terraform/
-terraform.tfstate
-terraform.tfstate.backup
-.terraform.lock.hcl
-.terraform/
-terraform.tfstate
-terraform.tfstate.backup
-.terraform.lock.hcl
+
+# Standard JSON Configs (EXCEPTIONS)
+!package.json
+!package-lock.json
+!tsconfig.json
+!firestore.indexes.json
+!firestore.rules.json
+!firebase.json
+!.firebaserc
+
+# OS
+.DS_Store

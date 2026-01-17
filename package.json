@@ -1,7 +1,7 @@
 {
   "name": "myaudit--the-audit-tax-assistant-for-my-entities",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.2.24",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,9 +9,10 @@
     "build:primary": "BUILD_OUTPUT_DIR=dist vite build",
     "build:kontrol": "BUILD_OUTPUT_DIR=dist-kontrol vite build",
     "preview": "vite preview",
-    "deploy:kontrol": "npm run build:kontrol && firebase deploy --only hosting:kontrol",
     "deploy:primary": "npm run build:primary && firebase deploy --only hosting:primary",
-    "seed:rule-registry": "ts-node backend/scripts/seedRuleRegistry.ts",
+    "deploy:kontrol": "npm run build:kontrol && firebase deploy --only hosting:kontrol",
+    "seed:rule-registry": "ts-node --compiler-options '{\"module\":\"commonjs\"}' backend/scripts/seedRuleRegistry.ts",
+    "seed:sovereign": "ts-node --compiler-options '{\"module\":\"commonjs\"}' scripts/seed-sovereign-substrate.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -35,6 +36,7 @@
     "@types/react": "^19.2.8",
     "@types/react-dom": "^19.2.3",
     "firebase-tools": "^13.0.0",
+    "ts-node": "^10.9.2",
     "typescript": "~5.8.2"
   }
 }
