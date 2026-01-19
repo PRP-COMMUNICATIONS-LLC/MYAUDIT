@@ -166,7 +166,6 @@ export default function App() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isAuditMode, setIsAuditMode] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const [pendingReclass, setPendingReclass] = useState<Record<string, Partial<UILedgerEntry>>>({});
   const [showIntro, setShowIntro] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -385,7 +384,9 @@ export default function App() {
           {/* --- SOVEREIGN HEADER --- */}
           <SovereignHeader user={user} isAuditMode={isAuditMode} />
 
-          {/* --- MAIN WORKFLOW CANVAS --- */}
+      {!showIntro && (
+        <ForensicProvider setActiveTab={setActiveTab} user={user}>
+          <SovereignHeader projectName="MYAUDIT" user={user} isAuditMode={useForensicContext().isAuditMode} />
           <main className="flex-1 overflow-y-auto p-10 max-w-6xl mx-auto w-full">
             
             {/* TAB 1: SETUP */}
@@ -611,3 +612,5 @@ export default function App() {
     </div>
   );
 }
+
+export default App;
