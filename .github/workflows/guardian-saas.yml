@@ -1,38 +1,56 @@
-name: 🛡️ Guardian Deployment & Verification
+name: Guardian Deployment & Verification
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   deploy_and_verify:
     runs-on: ubuntu-latest
     steps:
-      - name: ⬇️ Checkout Repo
+      - name: 🛰️ Checkout Repository
         uses: actions/checkout@v4
 
-      - name: 🏗️ Install Root Dependencies
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 🛠️ Install Dependencies
         run: npm install
 
-      - name: 🏗️ Install Functions Dependencies
-        run: |
-          cd backend/functions
-          npm install
-
-      - name: 🏗️ Build Frontend
+      - name: 🏗️ Build Production Assets
         run: npm run build
 
-      - name: 🚀 Deploy Security Rules & Functions
-        uses: w9jds/firebase-action@master
+      - name: 🔐 Authenticate with Google Cloud
+        uses: 'google-github-actions/auth@v2'
         with:
-          args: deploy --only hosting,functions,firestore
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          credentials_json: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}'
 
-      - name: 🔍 Verify Regional Lock (asia-southeast1)
+      - name: ☁️ Set up Cloud SDK
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      - name: 🛡️ SENTINEL: Verify Sovereign Substrate
+        run: |
+          chmod +x scripts/verify-myaudit-control-plane.sh
+          ./scripts/verify-myaudit-control-plane.sh
+        env:
+          PROJECT_ID: rpr-myaudit
+
+      - name: 🚀 Deploy to Authoritative Substrate
         uses: w9jds/firebase-action@master
         with:
-          args: functions:list
+          args: deploy --only hosting,functions
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          PROJECT_ID: rpr-myaudit
+
+      - name: 📍 Post-Deployment Regional Audit
+        run: |
+          LOCATION=$(gcloud firestore databases list --project=rpr-myaudit --format="value(locationId)" --filter="name:default")
+          echo "Current Location: $LOCATION"
+          if [ "$LOCATION" != "asia-southeast1" ]; then
+            echo "CRITICAL: Sovereign Substrate Violation Detected ($LOCATION)"
+            exit 1
+          fi

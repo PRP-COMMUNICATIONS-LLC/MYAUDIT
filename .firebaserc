@@ -1,5 +1,18 @@
 {
   "projects": {
-    "default": "myaudit-tax-2026"
-  }
+    "default": "rpr-myaudit"
+  },
+  "targets": {
+    "rpr-myaudit": {
+      "hosting": {
+        "primary": [
+          "rpr-myaudit"
+        ],
+        "kontrol": [
+          "myaudit-kontrol-dashboard"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }
